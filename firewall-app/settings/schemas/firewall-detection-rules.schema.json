@@ -1,0 +1,82 @@
+{
+  "$schema": "https://developer.dynatrace.com/docs-assets/schema_strict_apps.json",
+  "dynatrace": "1",
+  "schemaId": "firewall-detection-rules",
+  "version": "0.0.1",
+  "multiObject": true,
+  "maxObjects": 100,
+  "ordered": false,
+  "summaryPattern": "{ruleName}",
+  "displayName": "Firewall Detection Rules",
+  "description": "Anomaly detection rules for Palo Alto PAN-OS firewall traffic logs.",
+  "properties": {
+    "ruleName": {
+      "displayName": "Rule Name",
+      "description": "The unique name of the detection rule.",
+      "type": "text",
+      "nullable": false,
+      "default": "",
+      "constraints": [
+        {
+          "type": "LENGTH",
+          "maxLength": 200,
+          "minLength": 1
+        }
+      ]
+    },
+    "category": {
+      "displayName": "Category",
+      "description": "The rule category (traffic, source, policy, highrisk, session).",
+      "type": "text",
+      "nullable": false,
+      "default": "",
+      "constraints": [
+        {
+          "type": "LENGTH",
+          "maxLength": 100,
+          "minLength": 1
+        }
+      ]
+    },
+    "description": {
+      "displayName": "Description",
+      "description": "A human-readable description of what this rule detects.",
+      "type": "text",
+      "nullable": false,
+      "default": "",
+      "constraints": [
+        {
+          "type": "LENGTH",
+          "maxLength": 2000,
+          "minLength": 1
+        }
+      ]
+    },
+    "recommended": {
+      "displayName": "Recommended",
+      "description": "Whether this rule is a recommended default.",
+      "type": "boolean",
+      "default": false
+    },
+    "dqlQuery": {
+      "displayName": "DQL Query",
+      "description": "The Dynatrace Query Language query used for detection.",
+      "type": "text",
+      "nullable": false,
+      "default": "",
+      "constraints": [
+        {
+          "type": "LENGTH",
+          "maxLength": 5000,
+          "minLength": 1
+        }
+      ]
+    },
+    "enabled": {
+      "displayName": "Enabled",
+      "description": "Whether this detection rule is currently active.",
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

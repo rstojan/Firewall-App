@@ -3,13 +3,22 @@
   "environmentUrl": "https://arb10962.sprint.apps.dynatracelabs.com/",
   "app": {
     "name": "Firewall App",
-    "version": "0.0.7",
+    "version": "0.0.9",
     "description": "A starting project with routing, fetching data, and charting",
     "id": "my.firewall.app",
     "icon": "ui/assets/icon.svg",
     "scopes": [
       { "name": "storage:logs:read", "comment": "default template" },
-      { "name": "storage:buckets:read", "comment": "default template" }
-    ]
+      { "name": "storage:buckets:read", "comment": "default template" },
+      { "name": "app-settings:objects:read", "comment": "read detection rule activation state" },
+      { "name": "app-settings:objects:write", "comment": "persist detection rule activation state" }
+    ],
+    "settings": {
+      "detectionRules": {
+        "name": "Detection Rules",
+        "description": "Manage anomaly detection rules for Palo Alto firewall traffic logs.",
+        "schemaIds": ["firewall-detection-rules"]
+      }
+    }
   }
 }
