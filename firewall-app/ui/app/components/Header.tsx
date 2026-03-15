@@ -16,6 +16,9 @@ export const Header = () => {
         <AppHeader.NavItem as={Link} to="/analyzer">
           Traffic Analyzer
         </AppHeader.NavItem>
+        <AppHeader.NavItem as={Link} to="/logs">
+          Firewall Logs
+        </AppHeader.NavItem>
       </AppHeader.NavItems>
     </AppHeader>
   );

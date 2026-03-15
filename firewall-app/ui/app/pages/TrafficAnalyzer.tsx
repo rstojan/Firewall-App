@@ -13,6 +13,31 @@ import { useDql } from "@dynatrace-sdk/react-hooks";
 
 import type { Timeframe } from "@dynatrace/strato-components/core";
 
+// ─── Column helpers ──────────────────────────────────────────────────────────
+
+function prettifyHeader(name: string): string {
+  const stripped = name.replace(/^(paloalto|log)\./, "");
+  let pretty = stripped
+    .replace(/[_.]/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+  const renames: Record<string, string> = {
+    "Src": "Source",
+    "Dst": "Destination",
+    "Dport": "Destination Port",
+  };
+  return renames[pretty] ?? pretty;
+}
+
+function prettyColumns(types: Parameters<typeof convertToColumns>[0]) {
+  const cols = convertToColumns(types);
+  for (const col of cols) {
+    if (typeof col.header === "string") {
+      col.header = prettifyHeader(col.header);
+    }
+  }
+  return cols;
+}
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface QueryParams {
@@ -121,7 +146,7 @@ const BlockedResults = ({ params }: { params: QueryParams }) => {
       {count > 0 && data?.records && data.types && (
         <DataTable
           data={data.records}
-          columns={convertToColumns(data.types)}
+          columns={prettyColumns(data.types)}
           resizable
         >
           <DataTable.Pagination defaultPageSize={25} />
@@ -148,7 +173,7 @@ const BlockReasonSummary = ({ params }: { params: QueryParams }) => {
       {data.types && (
         <DataTable
           data={data.records}
-          columns={convertToColumns(data.types)}
+          columns={prettyColumns(data.types)}
           resizable
         >
           <DataTable.Pagination defaultPageSize={10} />
