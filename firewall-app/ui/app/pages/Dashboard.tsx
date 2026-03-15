@@ -467,7 +467,14 @@ const BandwidthChart = () => {
 export const Dashboard = () => {
   return (
     <Flex flexDirection="column" padding={32} gap={16}>
-      <Heading level={1}>Palo Alto Firewall Log Analysis</Heading>
+      <Flex alignItems="center" gap={16}>
+        <img
+          src="./assets/PaloAlto.png"
+          alt="Palo Alto Networks"
+          style={{ maxHeight: 48, maxWidth: 120, objectFit: "contain" }}
+        />
+        <Heading level={1}>Palo Alto Firewall Log Analysis</Heading>
+      </Flex>
 
       <SummarySection />
 

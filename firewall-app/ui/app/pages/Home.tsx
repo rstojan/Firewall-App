@@ -10,11 +10,9 @@ export const Home = () => {
   return (
     <Flex flexDirection="column" alignItems="center" padding={32}>
       <img
-        src="./assets/Dynatrace_Logo.svg"
-        alt="Dynatrace Logo"
-        width={150}
-        height={150}
-        style={{ paddingBottom: 32 }}
+        src="./assets/PaloAlto.png"
+        alt="Palo Alto Networks Logo"
+        style={{ maxWidth: 200, maxHeight: 120, objectFit: "contain", paddingBottom: 32 }}
       ></img>
 
       <Heading>Palo Alto Firewall Log Analyzer</Heading>
@@ -25,10 +23,22 @@ export const Home = () => {
         and bandwidth usage across all firewall rules and zones. Use the Traffic
         Analyzer to investigate whether specific traffic is being blocked by
         entering a source IP, destination IP, or both — and see exactly which
-        firewall rule and action caused the block.
+        firewall rule and action caused the block. New to this setup? Follow the
+        step-by-step Setup Guide to configure syslog forwarding from your Palo
+        Alto device to Dynatrace.
       </Paragraph>
 
-      <Flex gap={48} paddingTop={64} flexFlow="wrap">
+      <Flex gap={48} paddingTop={64} flexFlow="wrap" justifyContent="center">
+        <Card
+          href="/setup"
+          inAppLink
+          imgSrc={
+            theme === "light"
+              ? "./assets/community.png"
+              : "./assets/community_dark.png"
+          }
+          name="Setup Guide"
+        />
         <Card
           href="/dashboard"
           inAppLink

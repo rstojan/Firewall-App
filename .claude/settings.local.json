@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import sys,json; s=json.load\\(sys.stdin\\); print\\(json.dumps\\(list\\(s.get\\(''''properties'''',{}\\).get\\(''''app'''',{}\\).get\\(''''properties'''',{}\\).keys\\(\\)\\), indent=2\\)\\)\")",
+      "Bash(grep -o \"\"icon\"\"[^,]* c:/Users/rbrts/Firewall-App/firewall-app/.dt-app/app.config.schema.json)"
+    ]
+  }
+}
