@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useMemo, useState } from "react";
 
-import { Flex, Surface } from "@dynatrace/strato-components/layouts";
+import { Divider, Flex, Grid, Surface } from "@dynatrace/strato-components/layouts";
 import { Heading, Paragraph } from "@dynatrace/strato-components/typography";
 import { ProgressCircle } from "@dynatrace/strato-components/content";
 import {
@@ -189,13 +189,13 @@ const Q_BANDWIDTH = `fetch logs
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 const SectionHeader = ({ title }: { title: string }) => (
-  <Heading level={3} style={{ marginBottom: 8, marginTop: 24 }}>
+  <Heading level={3} style={{ marginBottom: 8 }}>
     {title}
   </Heading>
 );
 
 const QueryError = ({ message }: { message: string }) => (
-  <Flex alignItems="center" gap={8} style={{ color: Colors.Text.Critical.Default, padding: 16 }}>
+  <Flex alignItems="center" gap={8} style={{ color: Colors.Text.Critical.Default }} padding={16}>
     <CriticalIcon />
     <Paragraph>{message}</Paragraph>
   </Flex>
@@ -231,15 +231,11 @@ function toPieData(records: Record<string, unknown>[] | null | undefined, catego
   };
 }
 
-/** Convert a DQL field name like "paloalto.session_end_reason" → "Session End Reason". */
 function prettifyHeader(name: string): string {
-  // Strip known prefixes
   const stripped = name.replace(/^(paloalto|log)\./, "");
-  // Replace underscores and dots with spaces, then title-case each word
   let pretty = stripped
     .replace(/[_.]/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
-  // Friendly renames
   const renames: Record<string, string> = {
     "Src": "Source",
     "Dst": "Destination",
@@ -248,7 +244,6 @@ function prettifyHeader(name: string): string {
   return renames[pretty] ?? pretty;
 }
 
-/** Wraps convertToColumns and applies prettified headers. */
 function prettyColumns(types: Parameters<typeof convertToColumns>[0]) {
   const cols = convertToColumns(types);
   for (const col of cols) {
@@ -267,7 +262,7 @@ const OverviewSection = () => {
   const rec = summaryData?.records?.[0];
 
   return (
-    <Surface style={{ padding: 24 }}>
+    <Flex flexDirection="column">
       <SectionHeader title="All Firewall Logs — Overview" />
       {(summaryLoading || tableLoading) && <LoadingSpinner />}
       {summaryError && <QueryError message={summaryError.message} />}
@@ -298,6 +293,7 @@ const OverviewSection = () => {
           />
         </Flex>
       )}
+      <Divider />
       {tableError && <QueryError message={tableError.message} />}
       {tableData?.records && tableData.types && (
         <DataTable
@@ -308,14 +304,14 @@ const OverviewSection = () => {
           <DataTable.Pagination defaultPageSize={10} />
         </DataTable>
       )}
-    </Surface>
+    </Flex>
   );
 };
 
 const BlockedTable = () => {
   const { data, error, isLoading } = useFilteredDql(Q_BLOCKED);
   return (
-    <Surface style={{ padding: 24 }}>
+    <Flex flexDirection="column">
       <SectionHeader title="Blocked Traffic Only" />
       {isLoading && <LoadingSpinner />}
       {error && <QueryError message={error.message} />}
@@ -328,7 +324,7 @@ const BlockedTable = () => {
           <DataTable.Pagination defaultPageSize={10} />
         </DataTable>
       )}
-    </Surface>
+    </Flex>
   );
 };
 
@@ -336,14 +332,14 @@ const BlockedByRuleChart = () => {
   const { data, error, isLoading } = useFilteredDql(Q_BLOCKED_BY_RULE);
   const chartData = toBarData(data?.records, "paloalto.rule", "block_count");
   return (
-    <Surface style={{ padding: 24, flex: 1 }}>
+    <Flex flexDirection="column">
       <SectionHeader title="Blocked by Firewall Rule" />
       {isLoading && <LoadingSpinner />}
       {error && <QueryError message={error.message} />}
       {chartData.length > 0 && (
         <CategoricalBarChart data={chartData} layout="horizontal" height={300} />
       )}
-    </Surface>
+    </Flex>
   );
 };
 
@@ -351,7 +347,7 @@ const BlockedByAppChart = () => {
   const { data, error, isLoading } = useFilteredDql(Q_BLOCKED_BY_APP);
   const pieData = toPieData(data?.records, "paloalto.app", "block_count");
   return (
-    <Surface style={{ padding: 24, flex: 1 }}>
+    <Flex flexDirection="column">
       <SectionHeader title="Blocked by Application" />
       {isLoading && <LoadingSpinner />}
       {error && <QueryError message={error.message} />}
@@ -361,7 +357,7 @@ const BlockedByAppChart = () => {
           <PieChart.Legend />
         </PieChart>
       )}
-    </Surface>
+    </Flex>
   );
 };
 
@@ -369,7 +365,7 @@ const BlockedByActionChart = () => {
   const { data, error, isLoading } = useFilteredDql(Q_BLOCKED_BY_ACTION);
   const pieData = toPieData(data?.records, "paloalto.action", "count");
   return (
-    <Surface style={{ padding: 24, flex: 1 }}>
+    <Flex flexDirection="column">
       <SectionHeader title="Blocked by Action Type" />
       {isLoading && <LoadingSpinner />}
       {error && <QueryError message={error.message} />}
@@ -378,14 +374,14 @@ const BlockedByActionChart = () => {
           <PieChart.Legend />
         </PieChart>
       )}
-    </Surface>
+    </Flex>
   );
 };
 
 const ZonePairTable = () => {
   const { data, error, isLoading } = useFilteredDql(Q_ZONE_PAIRS);
   return (
-    <Surface style={{ padding: 24, flex: 1 }}>
+    <Flex flexDirection="column">
       <SectionHeader title="Zone Pair Analysis" />
       {isLoading && <LoadingSpinner />}
       {error && <QueryError message={error.message} />}
@@ -398,14 +394,14 @@ const ZonePairTable = () => {
           <DataTable.Pagination defaultPageSize={10} />
         </DataTable>
       )}
-    </Surface>
+    </Flex>
   );
 };
 
 const TopBlockedDstTable = () => {
   const { data, error, isLoading } = useFilteredDql(Q_TOP_BLOCKED_DST);
   return (
-    <Surface style={{ padding: 24, flex: 1 }}>
+    <Flex flexDirection="column">
       <SectionHeader title="Top Blocked Destinations" />
       {isLoading && <LoadingSpinner />}
       {error && <QueryError message={error.message} />}
@@ -418,14 +414,14 @@ const TopBlockedDstTable = () => {
           <DataTable.Pagination defaultPageSize={10} />
         </DataTable>
       )}
-    </Surface>
+    </Flex>
   );
 };
 
 const TopBlockedSrcTable = () => {
   const { data, error, isLoading } = useFilteredDql(Q_TOP_BLOCKED_SRC);
   return (
-    <Surface style={{ padding: 24, flex: 1 }}>
+    <Flex flexDirection="column">
       <SectionHeader title="Top Blocked Sources" />
       {isLoading && <LoadingSpinner />}
       {error && <QueryError message={error.message} />}
@@ -438,14 +434,14 @@ const TopBlockedSrcTable = () => {
           <DataTable.Pagination defaultPageSize={10} />
         </DataTable>
       )}
-    </Surface>
+    </Flex>
   );
 };
 
 const TimeseriesSection = () => {
   const { data, error, isLoading } = useFilteredDql(Q_TIMESERIES);
   return (
-    <Surface style={{ padding: 24 }}>
+    <Flex flexDirection="column">
       <SectionHeader title="Blocked vs Allowed Traffic Over Time" />
       {isLoading && <LoadingSpinner />}
       {error && <QueryError message={error.message} />}
@@ -457,14 +453,14 @@ const TimeseriesSection = () => {
           height={280}
         />
       )}
-    </Surface>
+    </Flex>
   );
 };
 
 const HighRiskTable = () => {
   const { data, error, isLoading } = useFilteredDql(Q_HIGH_RISK);
   return (
-    <Surface style={{ padding: 24 }}>
+    <Flex flexDirection="column">
       <SectionHeader title="High-Risk Port Blocks (RDP/SQL/FTP)" />
       {isLoading && <LoadingSpinner />}
       {error && <QueryError message={error.message} />}
@@ -477,14 +473,14 @@ const HighRiskTable = () => {
           <DataTable.Pagination defaultPageSize={10} />
         </DataTable>
       )}
-    </Surface>
+    </Flex>
   );
 };
 
 const SessionReasonsTable = () => {
   const { data, error, isLoading } = useFilteredDql(Q_SESSION_REASONS);
   return (
-    <Surface style={{ padding: 24, flex: 1 }}>
+    <Flex flexDirection="column">
       <SectionHeader title="Session End Reason Breakdown" />
       {isLoading && <LoadingSpinner />}
       {error && <QueryError message={error.message} />}
@@ -497,7 +493,7 @@ const SessionReasonsTable = () => {
           <DataTable.Pagination defaultPageSize={10} />
         </DataTable>
       )}
-    </Surface>
+    </Flex>
   );
 };
 
@@ -505,14 +501,14 @@ const BandwidthChart = () => {
   const { data, error, isLoading } = useFilteredDql(Q_BANDWIDTH);
   const chartData = toBarData(data?.records, "paloalto.app", "total_bytes");
   return (
-    <Surface style={{ padding: 24, flex: 1 }}>
+    <Flex flexDirection="column">
       <SectionHeader title="Bandwidth by Application (Allowed Sessions)" />
       {isLoading && <LoadingSpinner />}
       {error && <QueryError message={error.message} />}
       {chartData.length > 0 && (
         <CategoricalBarChart data={chartData} layout="horizontal" height={300} />
       )}
-    </Surface>
+    </Flex>
   );
 };
 
@@ -524,51 +520,68 @@ export const Dashboard = () => {
   return (
     <SegmentsProvider>
       <TimeframeContext.Provider value={timeframe}>
-        <Flex flexDirection="column" padding={32} gap={16}>
-          <Flex alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={16}>
-            <Flex alignItems="center" gap={16}>
-              <img
-                src="./assets/PaloAlto.png"
-                alt="Palo Alto Networks"
-                style={{ maxHeight: 48, maxWidth: 120, objectFit: "contain" }}
-              />
-              <Heading level={1}>Palo Alto Firewall Log Analysis</Heading>
+        <Flex flexDirection="column" padding={32} gap={20}>
+          {/* Header bar with title and filters */}
+          <Surface elevation="raised" padding={16}>
+            <Flex alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={16}>
+              <Flex alignItems="center" gap={16}>
+                <img
+                  src="./assets/PaloAlto.png"
+                  alt="Palo Alto Networks"
+                  style={{ maxHeight: 48, maxWidth: 120, objectFit: "contain" }}
+                />
+                <Heading level={1}>Palo Alto Firewall Log Analysis</Heading>
+              </Flex>
+              <Flex gap={16} flexWrap="wrap" alignItems="center">
+                <TimeframeSelector
+                  value={timeframe}
+                  onChange={(value) => { if (value) setTimeframe(value); }}
+                />
+                <SegmentSelector />
+              </Flex>
             </Flex>
-            <Flex gap={16} flexWrap="wrap" alignItems="center">
-              <TimeframeSelector
-                value={timeframe}
-                onChange={(value) => { if (value) setTimeframe(value); }}
-              />
-              <SegmentSelector />
-            </Flex>
-          </Flex>
+          </Surface>
 
+          {/* Timeseries chart */}
           <TimeseriesSection />
 
+          <Divider />
+
+          {/* Blocked traffic table */}
           <BlockedTable />
 
-          <Flex gap={16} flexWrap="wrap">
+          {/* Charts row: rule + app */}
+          <Grid gridTemplateColumns="repeat(auto-fit, minmax(400px, 1fr))" gap={16}>
             <BlockedByRuleChart />
             <BlockedByAppChart />
-          </Flex>
+          </Grid>
 
-          <Flex gap={16} flexWrap="wrap">
+          {/* Charts row: action + zone pairs */}
+          <Grid gridTemplateColumns="repeat(auto-fit, minmax(400px, 1fr))" gap={16}>
             <BlockedByActionChart />
             <ZonePairTable />
-          </Flex>
+          </Grid>
 
-          <Flex gap={16} flexWrap="wrap">
+          {/* Tables row: top sources + destinations */}
+          <Grid gridTemplateColumns="repeat(auto-fit, minmax(400px, 1fr))" gap={16}>
             <TopBlockedSrcTable />
             <TopBlockedDstTable />
-          </Flex>
+          </Grid>
 
+          <Divider />
+
+          {/* High-risk port blocks */}
           <HighRiskTable />
 
-          <Flex gap={16} flexWrap="wrap">
+          {/* Session reasons + bandwidth */}
+          <Grid gridTemplateColumns="repeat(auto-fit, minmax(400px, 1fr))" gap={16}>
             <SessionReasonsTable />
             <BandwidthChart />
-          </Flex>
+          </Grid>
 
+          <Divider />
+
+          {/* Full overview at bottom */}
           <OverviewSection />
         </Flex>
       </TimeframeContext.Provider>

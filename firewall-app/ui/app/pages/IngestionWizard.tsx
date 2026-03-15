@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Flex, Surface } from "@dynatrace/strato-components/layouts";
+import { Container, Flex, Surface } from "@dynatrace/strato-components/layouts";
 import { Divider } from "@dynatrace/strato-components/layouts";
 import { Heading, Paragraph, Strong, Text } from "@dynatrace/strato-components/typography";
 import { Button } from "@dynatrace/strato-components/buttons";
@@ -190,7 +190,7 @@ const StepSyslogProfile = () => (
     </Flex>
 
     <Heading level={3}>Syslog Server settings</Heading>
-    <Surface style={{ padding: 16 }}>
+    <Container variant="minimal" color="neutral" padding={16}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
         <thead>
           <tr style={{ borderBottom: `1px solid ${Colors.Border.Neutral.Default}` }}>
@@ -214,7 +214,7 @@ const StepSyslogProfile = () => (
           ))}
         </tbody>
       </table>
-    </Surface>
+    </Container>
 
     <Heading level={3}>Via CLI</Heading>
     <CodeSnippet language="bash" showLineNumbers={false}>
@@ -429,7 +429,7 @@ const StepVerify = () => (
 
     <Heading level={3}>Troubleshooting</Heading>
     <Flex flexDirection="column" gap={12}>
-      <Surface style={{ padding: 16 }}>
+      <Container variant="default" color="critical" padding={16}>
         <Paragraph><Strong>No logs appearing in Grail</Strong></Paragraph>
         <Flex flexDirection="column" gap={4} style={{ marginTop: 6 }}>
           {[
@@ -444,9 +444,9 @@ const StepVerify = () => (
             </Flex>
           ))}
         </Flex>
-      </Surface>
+      </Container>
 
-      <Surface style={{ padding: 16 }}>
+      <Container variant="default" color="warning" padding={16}>
         <Paragraph><Strong>Logs arriving but paloalto.* attributes are missing</Strong></Paragraph>
         <Flex flexDirection="column" gap={4} style={{ marginTop: 6 }}>
           {[
@@ -460,9 +460,9 @@ const StepVerify = () => (
             </Flex>
           ))}
         </Flex>
-      </Surface>
+      </Container>
 
-      <Surface style={{ padding: 16 }}>
+      <Container variant="default" color="neutral" padding={16}>
         <Paragraph><Strong>Logs arriving with delay</Strong></Paragraph>
         <Flex flexDirection="column" gap={4} style={{ marginTop: 6 }}>
           {[
@@ -476,7 +476,7 @@ const StepVerify = () => (
             </Flex>
           ))}
         </Flex>
-      </Surface>
+      </Container>
     </Flex>
 
     <MessageContainer variant="success">
@@ -575,14 +575,16 @@ export const IngestionWizard = () => {
 
   return (
     <Flex flexDirection="column" padding={32} gap={20}>
-      <Flex flexDirection="column" gap={4}>
+      {/* Page header */}
+      <Surface elevation="flat" padding={16}>
         <Heading level={1}>Syslog Ingestion Setup</Heading>
-        <Paragraph style={{ color: Colors.Text.Neutral.Subdued }}>
+        <Paragraph style={{ color: Colors.Text.Neutral.Subdued, marginTop: 4 }}>
           Configure Palo Alto Networks PAN-OS to forward firewall logs into
           Dynatrace Grail
         </Paragraph>
-      </Flex>
+      </Surface>
 
+      {/* Progress bar */}
       <Flex alignItems="center" gap={12}>
         <Text style={{ fontSize: 13, color: Colors.Text.Neutral.Subdued, whiteSpace: "nowrap" }}>
           Step {currentStep + 1} of {STEPS.length}
@@ -593,9 +595,10 @@ export const IngestionWizard = () => {
         </Text>
       </Flex>
 
+      {/* Two-column layout: sidebar + main */}
       <Flex gap={24} alignItems="flex-start">
-        {/* Sidebar */}
-        <Surface style={{ padding: 12, minWidth: 220, flexShrink: 0 }}>
+        {/* Sidebar navigation */}
+        <Surface elevation="raised" padding={12} style={{ minWidth: 220, flexShrink: 0 }}>
           <StepIndicator
             steps={STEPS}
             currentStep={currentStep}
@@ -603,8 +606,8 @@ export const IngestionWizard = () => {
           />
         </Surface>
 
-        {/* Main content */}
-        <Surface style={{ padding: 32, flex: 1, minWidth: 0 }}>
+        {/* Main step content */}
+        <Surface elevation="raised" padding={32} style={{ flex: 1, minWidth: 0 }}>
           {STEP_CONTENT[currentStep]}
 
           <Divider style={{ marginTop: 32, marginBottom: 20 }} />

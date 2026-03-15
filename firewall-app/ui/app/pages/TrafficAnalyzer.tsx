@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 
-import { Flex, Surface } from "@dynatrace/strato-components/layouts";
+import { Container, Divider, Flex, Surface } from "@dynatrace/strato-components/layouts";
 import { Heading, Paragraph, Strong } from "@dynatrace/strato-components/typography";
 import { Button } from "@dynatrace/strato-components/buttons";
 import { ProgressCircle } from "@dynatrace/strato-components/content";
 import { TextInput } from "@dynatrace/strato-components-preview/forms";
+import { FormField, Label } from "@dynatrace/strato-components/forms";
 import { TimeframeSelector } from "@dynatrace/strato-components-preview/filters";
 import { DataTable, convertToColumns } from "@dynatrace/strato-components-preview/tables";
 import Colors from "@dynatrace/strato-design-tokens/colors";
@@ -114,7 +115,7 @@ const BlockedResults = ({ params }: { params: QueryParams }) => {
 
   if (error) {
     return (
-      <Flex alignItems="center" gap={8} style={{ color: Colors.Text.Critical.Default, padding: 16 }}>
+      <Flex alignItems="center" gap={8} style={{ color: Colors.Text.Critical.Default }} padding={16}>
         <CriticalIcon />
         <Paragraph>{error.message}</Paragraph>
       </Flex>
@@ -125,23 +126,25 @@ const BlockedResults = ({ params }: { params: QueryParams }) => {
 
   return (
     <Flex flexDirection="column" gap={16}>
-      <Flex alignItems="center" gap={12}>
-        {count === 0 ? (
-          <>
-            <SuccessIcon style={{ color: Colors.Text.Success.Default }} />
+      {count === 0 ? (
+        <Container variant="default" color="success" padding={12}>
+          <Flex alignItems="center" gap={12}>
+            <SuccessIcon />
             <Paragraph>
               <Strong>No blocked traffic found</Strong> for the specified IPs in the selected timeframe.
             </Paragraph>
-          </>
-        ) : (
-          <>
-            <CriticalIcon style={{ color: Colors.Text.Critical.Default }} />
-            <Paragraph style={{ color: Colors.Text.Critical.Default }}>
+          </Flex>
+        </Container>
+      ) : (
+        <Container variant="default" color="critical" padding={12}>
+          <Flex alignItems="center" gap={12}>
+            <CriticalIcon />
+            <Paragraph>
               <Strong>{count} blocked event{count !== 1 ? "s" : ""} found</Strong>
             </Paragraph>
-          </>
-        )}
-      </Flex>
+          </Flex>
+        </Container>
+      )}
 
       {count > 0 && data?.records && data.types && (
         <DataTable
@@ -163,7 +166,7 @@ const BlockReasonSummary = ({ params }: { params: QueryParams }) => {
   if (isLoading || error || !data?.records?.length) return null;
 
   return (
-    <Surface style={{ padding: 24 }}>
+    <Surface elevation="raised" padding={24}>
       <Heading level={3} style={{ marginBottom: 12 }}>
         Block Reason Summary
       </Heading>
@@ -206,48 +209,46 @@ export const TrafficAnalyzer = () => {
 
   return (
     <Flex flexDirection="column" padding={32} gap={24}>
-      <Heading level={1}>Traffic Analyzer</Heading>
-      <Paragraph>
-        Enter a source IP, destination IP, or both to investigate whether traffic is being blocked
-        and understand why.
-      </Paragraph>
+      {/* Page header */}
+      <Surface elevation="flat" padding={16}>
+        <Heading level={1}>Traffic Analyzer</Heading>
+        <Paragraph style={{ marginTop: 4 }}>
+          Enter a source IP, destination IP, or both to investigate whether traffic is being blocked
+          and understand why.
+        </Paragraph>
+      </Surface>
 
-      <Surface style={{ padding: 24 }}>
+      {/* Search form */}
+      <Surface elevation="raised" padding={24}>
         <Heading level={3} style={{ marginBottom: 16 }}>
           IP Address Lookup
         </Heading>
         <Flex gap={16} flexWrap="wrap" alignItems="flex-end">
-          <Flex flexDirection="column" gap={4} style={{ minWidth: 240 }}>
-            <Paragraph>
-              <Strong>Source IP</Strong>
-            </Paragraph>
+          <FormField style={{ minWidth: 240 }}>
+            <Label>Source IP</Label>
             <TextInput
               value={srcInput}
               onChange={(val) => setSrcInput(val ?? "")}
               placeholder="e.g. 192.168.1.10"
             />
-          </Flex>
+          </FormField>
 
-          <Flex flexDirection="column" gap={4} style={{ minWidth: 240 }}>
-            <Paragraph>
-              <Strong>Destination IP</Strong>
-            </Paragraph>
+          <FormField style={{ minWidth: 240 }}>
+            <Label>Destination IP</Label>
             <TextInput
               value={dstInput}
               onChange={(val) => setDstInput(val ?? "")}
               placeholder="e.g. 10.0.0.50"
             />
-          </Flex>
+          </FormField>
 
-          <Flex flexDirection="column" gap={4} style={{ minWidth: 240 }}>
-            <Paragraph>
-              <Strong>Timeframe</Strong>
-            </Paragraph>
+          <FormField style={{ minWidth: 240 }}>
+            <Label>Timeframe</Label>
             <TimeframeSelector
               value={timeframe}
               onChange={(value) => { if (value) setTimeframe(value); }}
             />
-          </Flex>
+          </FormField>
 
           <Flex gap={8}>
             <Button
@@ -272,17 +273,19 @@ export const TrafficAnalyzer = () => {
         )}
       </Surface>
 
+      {/* Results */}
       {activeParams && (
         <>
-          <Surface style={{ padding: 24 }}>
+          <Surface elevation="raised" padding={24}>
             <Heading level={3} style={{ marginBottom: 4 }}>
               Blocked Traffic
             </Heading>
-            <Paragraph style={{ marginBottom: 16, color: Colors.Text.Neutral.Default }}>
+            <Paragraph style={{ marginBottom: 12, color: Colors.Text.Neutral.Default }}>
               Showing denied/dropped sessions
               {activeParams.src ? ` from ${activeParams.src}` : ""}
               {activeParams.dst ? ` to ${activeParams.dst}` : ""}
             </Paragraph>
+            <Divider style={{ marginBottom: 16 }} />
             <BlockedResults params={activeParams} />
           </Surface>
 
