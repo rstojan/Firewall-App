@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from "react";
 
-import { Flex, Surface } from "@dynatrace/strato-components/layouts";
+import { Divider, Flex, Grid, Surface } from "@dynatrace/strato-components/layouts";
 import { Heading, Paragraph } from "@dynatrace/strato-components/typography";
 import { ProgressCircle } from "@dynatrace/strato-components/content";
 import { DataTable, convertToColumns } from "@dynatrace/strato-components-preview/tables";
-import { Select, SelectOption } from "@dynatrace/strato-components/forms";
+import { FormField, Label, Select, SelectOption } from "@dynatrace/strato-components/forms";
 import { TimeframeSelector } from "@dynatrace/strato-components/filters";
 import Colors from "@dynatrace/strato-design-tokens/colors";
 import { CriticalIcon } from "@dynatrace/strato-icons";
@@ -136,7 +136,8 @@ const FilterDropdown = ({
   }, [data, def.field]);
 
   return (
-    <Flex flexDirection="column" gap={4} style={{ minWidth: 180 }}>
+    <FormField>
+      <Label>{def.label}</Label>
       <Select<string, true>
         name={def.field}
         multiple={true}
@@ -153,7 +154,7 @@ const FilterDropdown = ({
           ))}
         </Select.Content>
       </Select>
-    </Flex>
+    </FormField>
   );
 };
 
@@ -180,17 +181,22 @@ export const FirewallLogs = () => {
 
   return (
     <Flex flexDirection="column" padding={32} gap={16}>
-      <Flex alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={16}>
-        <Heading level={1}>Firewall Logs</Heading>
-        <TimeframeSelector
-          value={timeframe}
-          onChange={(value) => { if (value) setTimeframe(value); }}
-        />
-      </Flex>
+      {/* Page header with timeframe */}
+      <Surface elevation="flat" padding={16}>
+        <Flex alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={16}>
+          <Heading level={1}>Firewall Logs</Heading>
+          <TimeframeSelector
+            value={timeframe}
+            onChange={(value) => { if (value) setTimeframe(value); }}
+          />
+        </Flex>
+      </Surface>
 
-      <Surface style={{ padding: 16 }}>
-        <Paragraph style={{ marginBottom: 12 }}><strong>Filters</strong></Paragraph>
-        <Flex gap={12} flexWrap="wrap" alignItems="flex-end">
+      {/* Filters */}
+      <Surface elevation="raised" padding={16}>
+        <Paragraph><strong>Filters</strong></Paragraph>
+        <Divider style={{ marginTop: 8, marginBottom: 12 }} />
+        <Grid gridTemplateColumns="repeat(auto-fill, minmax(180px, 1fr))" gap={12}>
           {FILTERS.map((def) => (
             <FilterDropdown
               key={def.field}
@@ -200,17 +206,18 @@ export const FirewallLogs = () => {
               onChange={(vals) => updateFilter(def.field, vals)}
             />
           ))}
-        </Flex>
+        </Grid>
       </Surface>
 
-      <Surface style={{ padding: 24 }}>
+      {/* Data table */}
+      <Surface elevation="raised" padding={24}>
         {isLoading && (
           <Flex justifyContent="center" alignItems="center" style={{ minHeight: 120 }}>
             <ProgressCircle />
           </Flex>
         )}
         {error && (
-          <Flex alignItems="center" gap={8} style={{ color: Colors.Text.Critical.Default, padding: 16 }}>
+          <Flex alignItems="center" gap={8} style={{ color: Colors.Text.Critical.Default }} padding={16}>
             <CriticalIcon />
             <Paragraph>{error.message}</Paragraph>
           </Flex>
