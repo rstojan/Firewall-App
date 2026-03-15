@@ -5,26 +5,43 @@ import { Heading, Paragraph, Strong } from "@dynatrace/strato-components/typogra
 import { Button } from "@dynatrace/strato-components/buttons";
 import { ProgressCircle } from "@dynatrace/strato-components/content";
 import { TextInput } from "@dynatrace/strato-components-preview/forms";
+import { TimeframeSelector } from "@dynatrace/strato-components-preview/filters";
 import { DataTable, convertToColumns } from "@dynatrace/strato-components-preview/tables";
 import Colors from "@dynatrace/strato-design-tokens/colors";
 import { CriticalIcon, SuccessIcon } from "@dynatrace/strato-icons";
 import { useDql } from "@dynatrace-sdk/react-hooks";
+
+import type { Timeframe } from "@dynatrace/strato-components/core";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface QueryParams {
   src: string;
   dst: string;
+  timeframe: Timeframe;
 }
+
+// ─── Defaults ────────────────────────────────────────────────────────────────
+
+const DEFAULT_TIMEFRAME: Timeframe = {
+  from: { absoluteDate: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), value: "now()-2h", type: "expression" },
+  to: { absoluteDate: new Date().toISOString(), value: "now()", type: "expression" },
+};
 
 // ─── Query builder ───────────────────────────────────────────────────────────
 
-function buildBlockedQuery(src: string, dst: string): string {
+function timeframeClause(tf: Timeframe): string {
+  const from = tf.from.type === "expression" ? tf.from.value : `"${tf.from.value}"`;
+  const to = tf.to.type === "expression" ? tf.to.value : `"${tf.to.value}"`;
+  return `, from: ${from}, to: ${to}`;
+}
+
+function buildBlockedQuery(src: string, dst: string, tf: Timeframe): string {
   const conditions: string[] = ['log.source == "palo-alto-firewall"', 'paloalto.action != "allow"'];
   if (src) conditions.push(`paloalto.src == "${src}"`);
   if (dst) conditions.push(`paloalto.dst == "${dst}"`);
 
-  return `fetch logs
+  return `fetch logs${timeframeClause(tf)}
 | filter ${conditions.join("\n         AND ")}
 | fields timestamp,
          paloalto.action,
@@ -41,12 +58,12 @@ function buildBlockedQuery(src: string, dst: string): string {
 | limit 200`;
 }
 
-function buildAllTrafficQuery(src: string, dst: string): string {
+function buildAllTrafficQuery(src: string, dst: string, tf: Timeframe): string {
   const conditions: string[] = ['log.source == "palo-alto-firewall"'];
   if (src) conditions.push(`paloalto.src == "${src}"`);
   if (dst) conditions.push(`paloalto.dst == "${dst}"`);
 
-  return `fetch logs
+  return `fetch logs${timeframeClause(tf)}
 | filter ${conditions.join("\n         AND ")}
 | fieldsAdd is_blocked = paloalto.action != "allow"
 | summarize total = count(),
@@ -59,7 +76,7 @@ function buildAllTrafficQuery(src: string, dst: string): string {
 // ─── Result components ───────────────────────────────────────────────────────
 
 const BlockedResults = ({ params }: { params: QueryParams }) => {
-  const query = buildBlockedQuery(params.src, params.dst);
+  const query = buildBlockedQuery(params.src, params.dst, params.timeframe);
   const { data, error, isLoading } = useDql({ query });
 
   if (isLoading) {
@@ -88,7 +105,7 @@ const BlockedResults = ({ params }: { params: QueryParams }) => {
           <>
             <SuccessIcon style={{ color: Colors.Text.Success.Default }} />
             <Paragraph>
-              <Strong>No blocked traffic found</Strong> for the specified IPs in the last 2 hours.
+              <Strong>No blocked traffic found</Strong> for the specified IPs in the selected timeframe.
             </Paragraph>
           </>
         ) : (
@@ -115,7 +132,7 @@ const BlockedResults = ({ params }: { params: QueryParams }) => {
 };
 
 const BlockReasonSummary = ({ params }: { params: QueryParams }) => {
-  const query = buildAllTrafficQuery(params.src, params.dst);
+  const query = buildAllTrafficQuery(params.src, params.dst, params.timeframe);
   const { data, error, isLoading } = useDql({ query });
 
   if (isLoading || error || !data?.records?.length) return null;
@@ -146,13 +163,14 @@ const BlockReasonSummary = ({ params }: { params: QueryParams }) => {
 export const TrafficAnalyzer = () => {
   const [srcInput, setSrcInput] = useState("");
   const [dstInput, setDstInput] = useState("");
+  const [timeframe, setTimeframe] = useState<Timeframe>(DEFAULT_TIMEFRAME);
   const [activeParams, setActiveParams] = useState<QueryParams | null>(null);
 
   const canSearch = srcInput.trim() !== "" || dstInput.trim() !== "";
 
   function handleSearch() {
     if (!canSearch) return;
-    setActiveParams({ src: srcInput.trim(), dst: dstInput.trim() });
+    setActiveParams({ src: srcInput.trim(), dst: dstInput.trim(), timeframe });
   }
 
   function handleClear() {
@@ -166,7 +184,7 @@ export const TrafficAnalyzer = () => {
       <Heading level={1}>Traffic Analyzer</Heading>
       <Paragraph>
         Enter a source IP, destination IP, or both to investigate whether traffic is being blocked
-        and understand why. Queries the last 2 hours of Palo Alto firewall logs.
+        and understand why.
       </Paragraph>
 
       <Surface style={{ padding: 24 }}>
@@ -193,6 +211,16 @@ export const TrafficAnalyzer = () => {
               value={dstInput}
               onChange={(val) => setDstInput(val ?? "")}
               placeholder="e.g. 10.0.0.50"
+            />
+          </Flex>
+
+          <Flex flexDirection="column" gap={4} style={{ minWidth: 240 }}>
+            <Paragraph>
+              <Strong>Timeframe</Strong>
+            </Paragraph>
+            <TimeframeSelector
+              value={timeframe}
+              onChange={(value) => { if (value) setTimeframe(value); }}
             />
           </Flex>
 
