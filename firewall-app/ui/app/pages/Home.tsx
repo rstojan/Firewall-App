@@ -2,11 +2,7 @@ import React from "react";
 
 import { useCurrentTheme } from "@dynatrace/strato-components/core";
 import { Flex } from "@dynatrace/strato-components/layouts";
-import {
-  Heading,
-  Paragraph,
-  Strong,
-} from "@dynatrace/strato-components/typography";
+import { Heading, Paragraph } from "@dynatrace/strato-components/typography";
 import { Card } from "../components/Card";
 
 export const Home = () => {
@@ -21,41 +17,35 @@ export const Home = () => {
         style={{ paddingBottom: 32 }}
       ></img>
 
-      <Heading>Welcome To Your Dynatrace App</Heading>
-      <Paragraph>
-        Edit <Strong>ui/app/pages/Home.tsx</Strong> and save to reload the app.
-      </Paragraph>
-      <Paragraph>
-        For more information and help on app development, check out the
-        following:
+      <Heading>Palo Alto Firewall Log Analyzer</Heading>
+      <Paragraph style={{ maxWidth: 640, textAlign: "center", marginTop: 8 }}>
+        This app analyzes Palo Alto Networks PAN-OS traffic logs ingested into
+        Dynatrace Grail. Use the Firewall Dashboard to explore traffic patterns,
+        blocked sessions, top sources and destinations, high-risk port activity,
+        and bandwidth usage across all firewall rules and zones. Use the Traffic
+        Analyzer to investigate whether specific traffic is being blocked by
+        entering a source IP, destination IP, or both — and see exactly which
+        firewall rule and action caused the block.
       </Paragraph>
 
       <Flex gap={48} paddingTop={64} flexFlow="wrap">
         <Card
-          href="/data"
+          href="/dashboard"
           inAppLink
           imgSrc={
             theme === "light" ? "./assets/data.png" : "./assets/data_dark.png"
           }
-          name="Explore data"
+          name="Firewall Dashboard"
         />
         <Card
-          href="https://dt-url.net/developers"
+          href="/analyzer"
+          inAppLink
           imgSrc={
             theme === "light"
               ? "./assets/devportal.png"
               : "./assets/devportal_dark.png"
           }
-          name="Dynatrace Developer"
-        />
-        <Card
-          href="https://dt-url.net/devcommunity"
-          imgSrc={
-            theme === "light"
-              ? "./assets/community.png"
-              : "./assets/community_dark.png"
-          }
-          name="Developer Community"
+          name="Traffic Analyzer"
         />
       </Flex>
     </Flex>
