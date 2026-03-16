@@ -3,7 +3,7 @@
   "environmentUrl": "https://arb10962.sprint.apps.dynatracelabs.com/",
   "app": {
     "name": "Firewall App",
-    "version": "0.0.12",
+    "version": "0.0.13",
     "description": "A starting project with routing, fetching data, and charting",
     "id": "my.firewall.app",
     "icon": "ui/assets/icon.svg",
