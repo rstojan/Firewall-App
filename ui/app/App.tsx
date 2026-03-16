@@ -6,6 +6,7 @@ import { IngestionWizard } from "./pages/IngestionWizard";
 import { TrafficAnalyzer } from "./pages/TrafficAnalyzer";
 import { FirewallLogs } from "./pages/FirewallLogs";
 import { Recommendations } from "./pages/Recommendations";
+import { DeepAnalysis } from "./pages/DeepAnalysis";
 import { Header } from "./components/Header";
 
 export const App = () => {
@@ -21,6 +22,7 @@ export const App = () => {
           <Route path="/analyzer" element={<TrafficAnalyzer />} />
           <Route path="/setup" element={<IngestionWizard />} />
           <Route path="/logs" element={<FirewallLogs />} />
+          <Route path="/deep-analysis" element={<DeepAnalysis />} />
           <Route path="/recommendations" element={<Recommendations />} />
         </Routes>
       </Page.Main>
