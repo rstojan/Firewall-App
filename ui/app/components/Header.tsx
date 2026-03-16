@@ -20,6 +20,9 @@ export const Header = () => {
           <AppHeader.NavItem as={Link} to="/analyzer" isSelected={pathname === "/analyzer"}>
             Traffic Analyzer
           </AppHeader.NavItem>
+          <AppHeader.NavItem as={Link} to="/deep-analysis" isSelected={pathname === "/deep-analysis"}>
+            Deep Analysis
+          </AppHeader.NavItem>
           <AppHeader.NavItem as={Link} to="/logs" isSelected={pathname === "/logs"}>
             Firewall Logs
           </AppHeader.NavItem>
