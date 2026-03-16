@@ -1,108 +1,87 @@
-# Palo Alto Firewall Log Analyzer
+# Firewall App for Dynatrace
 
-A Dynatrace AppEngine application for analyzing Palo Alto Networks PAN-OS firewall traffic logs ingested into Dynatrace Grail.
-
-## Overview
-
-This app provides visibility into firewall activity by querying structured `paloalto.*` log attributes stored in Grail. It is designed to help security and network teams quickly understand traffic patterns, identify blocked sessions, investigate specific IP pairs, and monitor high-risk port activity — all within the Dynatrace platform.
-
-Logs are expected to be ingested with `log.source == "palo-alto-firewall"` and structured fields produced by the **Palo Alto Firewall Log Generator** Dynatrace workflow, which generates a realistic mix of allowed and blocked traffic across multiple applications, network zones, and firewall rules.
+A Dynatrace Platform app for monitoring and analyzing Palo Alto PAN-OS firewall traffic logs. Built with React, TypeScript, and the Dynatrace Strato design system.
 
 ## Features
 
-### Firewall Dashboard
-
-A full analytics dashboard covering:
-
-- **Traffic Summary** — Total log count with allowed vs. blocked counts and percentages
-- **All Firewall Logs** — Paginated table of recent log entries with key fields
-- **Blocked Traffic** — Filtered view of denied and dropped sessions
-- **Blocked by Firewall Rule** — Horizontal bar chart showing which rules trigger the most blocks
-- **Blocked by Application** — Pie chart of blocked traffic broken down by application
-- **Blocked by Action Type** — Pie chart of deny/drop/reset action distribution
-- **Zone Pair Analysis** — Table of source/destination zone combinations with block rates
-- **Top Blocked Sources** — Top 20 source IPs generating blocked traffic
-- **Top Blocked Destinations** — Top 20 destination IPs receiving blocked traffic
-- **Traffic Over Time** — Line chart of allowed vs. blocked sessions in 5-minute intervals
-- **High-Risk Port Blocks** — Blocked sessions targeting RDP (3389), MSSQL (1433), MySQL (3306), FTP (21), and suspicious port 4444
-- **Session End Reason Breakdown** — Table of session end reasons (policy-deny, threat, tcp-fin, etc.) by action
-- **Bandwidth by Application** — Horizontal bar chart of total bytes transferred per application for allowed sessions
+### Overview Dashboard
+Full-featured dashboard with real-time visibility into firewall activity:
+- Summary metrics (total logs, allowed/blocked counts, allow/block rates)
+- Blocked vs allowed traffic over time (timeseries chart)
+- Blocked traffic breakdown by firewall rule, application, and action type
+- Zone pair analysis with block rates
+- Top blocked sources and destinations
+- High-risk port blocks (RDP, SQL, FTP)
+- Session end reason breakdown
+- Bandwidth by application
+- Timeframe selector and segment filtering
 
 ### Traffic Analyzer
+IP address investigation tool for troubleshooting blocked traffic:
+- Source and/or destination IP lookup
+- Blocked traffic event table with full session details
+- Block reason summary grouped by action, rule, and session end reason
+- Configurable timeframe
 
-An IP-based investigation tool that lets you enter a source IP, destination IP, or both to:
+### Firewall Logs
+Log exploration page with a sidebar filter panel:
+- 7 multi-select filter dropdowns (Action, App, Rule, From/To Zone, Session End Reason, Device)
+- Filter options populated dynamically from log data
+- Full log table with 13 columns, pagination, and resizable columns
+- Timeframe selector
 
-- Determine whether traffic between those addresses is being blocked
-- See every blocked session with the firewall rule, action, zone, application, and session end reason
-- Review a summary of block reasons grouped by action, rule, and session end reason
+### Recommendations
+Anomaly detection rules with persistent activation via Dynatrace App Settings:
+- 18 pre-built detection rules across 5 categories (Traffic Anomalies, Source Behavior, Policy & Compliance, High-Risk Activity, Session Anomalies)
+- One-click activate/deactivate with state persisted to the Dynatrace App Settings API
+- Each rule includes a DQL query, description, and recommended badge
+- Category-based accordion layout with expand/collapse all
 
-## Project Structure
+### Expand Monitoring
+Extension discovery modal accessible from the header:
+- Browse firewall-related extensions (Palo Alto PAN-OS, Check Point Firewall, Cisco Firepower)
+- Extension details fetched dynamically from the Dynatrace Hub API (logos, screenshots, descriptions)
+- In-modal detail view with screenshot carousel and "Add to environment" button
+- Search filtering
 
-```
-firewall-app/
-├── app.config.json          # App metadata, environment URL, and required scopes
-├── ui/
-│   ├── main.tsx
-│   └── app/
-│       ├── App.tsx          # Route definitions
-│       ├── components/
-│       │   ├── Header.tsx   # Navigation bar
-│       │   └── Card.tsx     # Home page card component
-│       └── pages/
-│           ├── Home.tsx         # Landing page
-│           ├── Dashboard.tsx    # Firewall analytics dashboard
-│           └── TrafficAnalyzer.tsx  # IP-based traffic investigation
-```
+### Add Logs (Ingestion Wizard)
+Step-by-step setup guide for configuring Palo Alto log ingestion:
+- ActiveGate setup instructions
+- Syslog profile configuration
+- Log forwarding setup
+- Ingestion verification
 
-## DQL Queries
+## Tech Stack
 
-All queries filter on `log.source == "palo-alto-firewall"` and use the following structured log attributes:
+- **Framework:** React 18 + TypeScript
+- **UI:** Dynatrace Strato design system (`@dynatrace/strato-components`)
+- **Data:** DQL queries via `@dynatrace-sdk/react-hooks`
+- **Settings persistence:** `@dynatrace-sdk/client-app-settings-v2`
+- **Hub integration:** `@dynatrace-sdk/http-client`
+- **Navigation:** React Router v6
+- **Build:** Dynatrace App Toolkit (`dt-app`)
 
-| Attribute | Description |
-|---|---|
-| `paloalto.action` | Firewall action: `allow`, `deny`, `drop`, `reset-both` |
-| `paloalto.src` | Source IP address |
-| `paloalto.dst` | Destination IP address |
-| `paloalto.app` | Application identified by the firewall |
-| `paloalto.rule` | Firewall rule name that matched the session |
-| `paloalto.from_zone` | Source security zone |
-| `paloalto.to_zone` | Destination security zone |
-| `paloalto.dport` | Destination port |
-| `paloalto.bytes_sent` | Bytes sent in the session |
-| `paloalto.bytes_received` | Bytes received in the session |
-| `paloalto.session_end_reason` | Reason the session ended |
-| `paloalto.device_name` | Name of the firewall device |
+## Available Scripts
 
-## Prerequisites
+In the project directory, you can run:
 
-- Access to a Dynatrace environment with Grail enabled
-- Palo Alto firewall logs ingested into Grail with the `paloalto.*` attribute schema
-- Node.js >= 16.13.0
+### `npm run start`
 
-## Getting Started
+Runs the app in development mode. A new browser window with your running app will be automatically opened.
 
-```bash
-cd firewall-app
-npm install
-npm run start     # local dev server with hot reload
-```
+### `npm run build`
 
-## Deployment
+Builds the app for production to the `dist` folder.
 
-Update `environmentUrl` in `app.config.json` to point to your Dynatrace environment, then:
+### `npm run deploy`
 
-```bash
-npm run build     # build for production
-npm run deploy    # deploy to the configured environment
-```
+Builds the app and deploys it to the specified environment in `app.config.json`.
 
-> **Note:** Each deployment requires a unique version number. Increment the `version` field in `app.config.json` before redeploying if the bundle content has changed.
+### `npm run uninstall`
 
-## Required Scopes
+Uninstalls the app from the specified environment in `app.config.json`.
 
-The following scopes must be listed in `app.config.json` under `scopes`:
+## Learn more
 
-| Scope | Purpose |
-|---|---|
-| `storage:logs:read` | Read firewall logs from Grail |
-| `storage:buckets:read` | Access Grail storage buckets |
+- [Dynatrace Developer](https://dt-url.net/developers) - Platform documentation
+- [React documentation](https://reactjs.org/)
