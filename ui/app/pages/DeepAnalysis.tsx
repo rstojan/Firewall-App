@@ -359,7 +359,7 @@ export const DeepAnalysis = () => {
             </Surface>
 
             {/* Main content area */}
-            <Flex flexDirection="column" style={{ flex: 1, minWidth: 0 }}>
+            <Flex flexDirection="column" style={{ flex: 1, minWidth: 0 }} key={activeSection}>
               {ActiveComponent && <ActiveComponent />}
             </Flex>
           </Flex>

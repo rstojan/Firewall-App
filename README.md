@@ -1,19 +1,28 @@
 # Firewall App for Dynatrace
 
-A Dynatrace Platform app for monitoring and analyzing Palo Alto PAN-OS firewall traffic logs. Built with React, TypeScript, and the Dynatrace Strato design system.
+A Dynatrace Platform app for monitoring and analyzing Palo Alto PAN-OS firewall traffic logs. Built with React, TypeScript, and the Dynatrace Strato design system, it provides at-a-glance security posture gauges, visual traffic breakdowns, deep-dive analysis tables, and anomaly detection — all powered by DQL queries against log data ingested via syslog.
 
 ## Features
 
 ### Overview Dashboard
-Full-featured dashboard with real-time visibility into firewall activity:
-- Summary metrics (total logs, allowed/blocked counts, allow/block rates)
-- Blocked vs allowed traffic over time (timeseries chart)
-- Blocked traffic breakdown by firewall rule, application, and action type
-- Zone pair analysis with block rates
-- Top blocked sources and destinations
-- High-risk port blocks (RDP, SQL, FTP)
-- Session end reason breakdown
-- Bandwidth by application
+Real-time security posture and traffic visibility:
+- **Summary KPIs** — total logs, allowed/blocked counts, allow/block rate percentages
+- **Block Rate gauge** — circular gauge showing % of traffic blocked, with threshold indicators
+- **High-Risk Port Exposure gauge** — % of blocks targeting RDP, SQL, FTP, and backdoor ports
+- **Threat Concentration meters** — unique attacking sources and targets relative to total blocks, with numeric values
+- **Timeseries chart** — blocked vs allowed traffic over time (5-minute intervals, area chart)
+- **Visual breakdowns** — blocked by firewall rule (bar), bandwidth by application (bar), blocked by application (pie), blocked by action type (pie)
+- **All Firewall Logs table** — latest 100 log entries with full session details
+- Global timeframe selector and Dynatrace segment filtering
+
+### Deep Analysis
+Tabular deep-dive into firewall data with a left sidebar navigation (similar to the Kubernetes app's Recommendations layout):
+- **Blocked Traffic** — recent blocked sessions with source, destination, app, rule, and zone details
+- **Zone Pair Analysis** — traffic flow between zones with total/allowed/blocked counts and block rates
+- **Top Blocked Sources** — top 20 attacking source IPs with block counts and target counts
+- **Top Blocked Destinations** — top 20 targeted destination IPs with block counts and attacker counts
+- **High-Risk Port Blocks** — blocked connections on RDP (3389), SQL Server (1433), MySQL (3306), FTP (21), and backdoor (4444) ports
+- **Session End Reasons** — breakdown of how and why sessions were terminated, grouped by reason and action
 - Timeframe selector and segment filtering
 
 ### Traffic Analyzer
@@ -24,7 +33,7 @@ IP address investigation tool for troubleshooting blocked traffic:
 - Configurable timeframe
 
 ### Firewall Logs
-Log exploration page with a sidebar filter panel:
+Full log exploration with a sidebar filter panel:
 - 7 multi-select filter dropdowns (Action, App, Rule, From/To Zone, Session End Reason, Device)
 - Filter options populated dynamically from log data
 - Full log table with 13 columns, pagination, and resizable columns
@@ -32,17 +41,17 @@ Log exploration page with a sidebar filter panel:
 
 ### Recommendations
 Anomaly detection rules with persistent activation via Dynatrace App Settings:
-- 18 pre-built detection rules across 5 categories (Traffic Anomalies, Source Behavior, Policy & Compliance, High-Risk Activity, Session Anomalies)
+- 18 pre-built detection rules across 5 categories (Traffic Anomalies, Source & Destination, Policy & Rules, High-Risk Ports, Session & Device)
 - One-click activate/deactivate with state persisted to the Dynatrace App Settings API
 - Each rule includes a DQL query, description, and recommended badge
-- Category-based accordion layout with expand/collapse all
+- Category-level activate/deactivate all and accordion layout
 
 ### Expand Monitoring
 Extension discovery modal accessible from the header:
 - Browse firewall-related extensions (Palo Alto PAN-OS, Check Point Firewall, Cisco Firepower)
-- Extension details fetched dynamically from the Dynatrace Hub API (logos, screenshots, descriptions)
-- In-modal detail view with screenshot carousel and "Add to environment" button
-- Search filtering
+- In-modal detail view with overview and key capabilities for each extension
+- Search filtering across extension names and descriptions
+- Link to Dynatrace Hub for installation
 
 ### Add Logs (Ingestion Wizard)
 Step-by-step setup guide for configuring Palo Alto log ingestion:
@@ -55,15 +64,13 @@ Step-by-step setup guide for configuring Palo Alto log ingestion:
 
 - **Framework:** React 18 + TypeScript
 - **UI:** Dynatrace Strato design system (`@dynatrace/strato-components`)
+- **Charts:** `GaugeChart`, `MeterBarChart`, `TimeseriesChart`, `CategoricalBarChart`, `PieChart`, `SingleValue`
 - **Data:** DQL queries via `@dynatrace-sdk/react-hooks`
 - **Settings persistence:** `@dynatrace-sdk/client-app-settings-v2`
-- **Hub integration:** `@dynatrace-sdk/http-client`
-- **Navigation:** React Router v6
+- **Navigation:** React Router v6, `@dynatrace-sdk/navigation`
 - **Build:** Dynatrace App Toolkit (`dt-app`)
 
 ## Available Scripts
-
-In the project directory, you can run:
 
 ### `npm run start`
 
