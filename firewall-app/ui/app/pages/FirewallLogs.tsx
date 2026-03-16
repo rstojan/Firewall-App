@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 
-import { Divider, Flex, Grid, Surface } from "@dynatrace/strato-components/layouts";
+import { Divider, Flex } from "@dynatrace/strato-components/layouts";
 import { Heading, Paragraph } from "@dynatrace/strato-components/typography";
 import { ProgressCircle } from "@dynatrace/strato-components/content";
 import { DataTable, convertToColumns } from "@dynatrace/strato-components-preview/tables";
@@ -182,21 +182,29 @@ export const FirewallLogs = () => {
   return (
     <Flex flexDirection="column" padding={32} gap={16}>
       {/* Page header with timeframe */}
-      <Surface elevation="flat" padding={16}>
-        <Flex alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={16}>
-          <Heading level={1}>Firewall Logs</Heading>
-          <TimeframeSelector
-            value={timeframe}
-            onChange={(value) => { if (value) setTimeframe(value); }}
-          />
-        </Flex>
-      </Surface>
+      <Flex alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={16}>
+        <Heading level={1}>Firewall Logs</Heading>
+        <TimeframeSelector
+          value={timeframe}
+          onChange={(value) => { if (value) setTimeframe(value); }}
+        />
+      </Flex>
 
-      {/* Filters */}
-      <Surface elevation="raised" padding={16}>
-        <Paragraph><strong>Filters</strong></Paragraph>
-        <Divider style={{ marginTop: 8, marginBottom: 12 }} />
-        <Grid gridTemplateColumns="repeat(auto-fill, minmax(180px, 1fr))" gap={12}>
+      {/* Sidebar filters + table */}
+      <Flex gap={24} style={{ minHeight: 0 }}>
+        {/* Left filter panel */}
+        <Flex
+          flexDirection="column"
+          gap={12}
+          style={{
+            width: 220,
+            flexShrink: 0,
+            borderRight: "1px solid var(--dt-colors-border-neutral-default)",
+            paddingRight: 24,
+          }}
+        >
+          <Paragraph><strong>Filters</strong></Paragraph>
+          <Divider />
           {FILTERS.map((def) => (
             <FilterDropdown
               key={def.field}
@@ -206,32 +214,32 @@ export const FirewallLogs = () => {
               onChange={(vals) => updateFilter(def.field, vals)}
             />
           ))}
-        </Grid>
-      </Surface>
+        </Flex>
 
-      {/* Data table */}
-      <Surface elevation="raised" padding={24}>
-        {isLoading && (
-          <Flex justifyContent="center" alignItems="center" style={{ minHeight: 120 }}>
-            <ProgressCircle />
-          </Flex>
-        )}
-        {error && (
-          <Flex alignItems="center" gap={8} style={{ color: Colors.Text.Critical.Default }} padding={16}>
-            <CriticalIcon />
-            <Paragraph>{error.message}</Paragraph>
-          </Flex>
-        )}
-        {data?.records && data.types && (
-          <DataTable
-            data={data.records}
-            columns={prettyColumns(data.types)}
-            resizable
-          >
-            <DataTable.Pagination defaultPageSize={25} />
-          </DataTable>
-        )}
-      </Surface>
+        {/* Main content area */}
+        <Flex flexDirection="column" gap={16} style={{ flex: 1, minWidth: 0 }}>
+          {isLoading && (
+            <Flex justifyContent="center" alignItems="center" style={{ minHeight: 120 }}>
+              <ProgressCircle />
+            </Flex>
+          )}
+          {error && (
+            <Flex alignItems="center" gap={8} style={{ color: Colors.Text.Critical.Default }} padding={16}>
+              <CriticalIcon />
+              <Paragraph>{error.message}</Paragraph>
+            </Flex>
+          )}
+          {data?.records && data.types && (
+            <DataTable
+              data={data.records}
+              columns={prettyColumns(data.types)}
+              resizable
+            >
+              <DataTable.Pagination defaultPageSize={25} />
+            </DataTable>
+          )}
+        </Flex>
+      </Flex>
     </Flex>
   );
 };
